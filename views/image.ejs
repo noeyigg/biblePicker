@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>말씀 뽑기</title>
+
+    <style>
+      body {
+        text-align: center;
+      }
+      .blank {
+        height: 50px;
+      }
+      canvas {
+        border: 1px solid #000;
+        display: block;
+        margin: 0 auto;
+      }
+      .btn {
+        width: 150px;
+        margin: 0 15px;
+        padding: 20px;
+        background-color: darkslategrey;
+        color: white;
+        font-size: 20px;
+        border: none;
+        border-radius: 15px;
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: background-color 0.3s, box-shadow 0.3s;
+      }
+
+      .btn:hover {
+        background-color: darkslategrey;
+        box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+      }
+
+      #returnBtn {
+        background-color: gray;
+      }
+
+      /* 메시지 스타일 */
+      .loading-message {
+        font-size: 24px;
+        color: #333;
+        margin-top: 100px;
+        display: inline-block;
+        font-weight: bold;
+      }
+
+      /* 캔버스 숨기기 */
+      #imageCanvas {
+        display: none;
+      }
+
+      /* 로딩 메시지 숨기기 */
+      .hidden {
+        display: none;
+      }
+
+      /* 버튼 숨기기 */
+      .hidden-btn {
+        display: none;
+      }
+
+      /* 애니메이션 효과를 위한 스타일 */
+      .dots {
+        animation: dot-blink 1.5s infinite;
+      }
+
+      /* 3개의 점이 반복되며 나타나는 애니메이션 */
+      @keyframes dot-blink {
+        0% {
+          content: "....";
+        }
+        25% {
+          content: "...";
+        }
+        50% {
+          content: "..";
+        }
+        75% {
+          content: ".";
+        }
+        100% {
+          content: "....";
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="blank"></div>
+    <h2>2025년 내게 주신 말씀</h2>
+    <!-- 로딩 메시지 -->
+    <div class="loading-message" id="loadingMessage">
+      말씀카드 뽑는중<span id="dots">...</span>
+    </div>
+    <!-- 캔버스 요소로 이미지와 텍스트를 그릴 곳 -->
+    <canvas id="imageCanvas"></canvas>
+
+    <br />
+    <!-- 저장 버튼 -->
+    <button
+      class="btn hidden-btn"
+      id="returnBtn"
+      onclick="window.location.href='/image'"
+    >
+      다시 뽑기
+    </button>
+    <button class="btn hidden-btn" id="saveBtn">이미지 저장</button>
+    <div class="blank"></div>
+
+    <script>
+      // 선택된 이미지 파일명
+      const imageName = "<%= imageName %>";
+      const canvas = document.getElementById("imageCanvas");
+      const ctx = canvas.getContext("2d");
+      const image = new Image();
+      image.src = `/images/${imageName}`;
+
+      // verse를 EJS 템플릿에서 백틱으로 감싸서 전달 받기
+      const verse = `<%= pickedBible[0] %>`;
+      const reference = "<%= pickedBible[1] %>";
+
+      // 페이지 로딩 후 3초 동안 메시지를 보여주고 캔버스를 표시
+      window.onload = function () {
+        let dotCount = 3;
+        const dotsElement = document.getElementById("dots");
+
+        setInterval(function () {
+          // "..." 점 개수를 동적으로 변경
+          if (dotCount === 3) {
+            dotsElement.textContent = ".";
+            dotCount = 1;
+          } else if (dotCount === 1) {
+            dotsElement.textContent = "..";
+            dotCount = 2;
+          } else if (dotCount === 2) {
+            dotsElement.textContent = "...";
+            dotCount = 3;
+          }
+        }, 500); // 점이 바뀌는 간격 (500ms)
+
+        setTimeout(function () {
+          // 로딩 메시지 숨기기
+          document.getElementById("loadingMessage").classList.add("hidden");
+          // 캔버스 표시
+          document.getElementById("imageCanvas").style.display = "block";
+          // 버튼 표시
+          document.getElementById("returnBtn").classList.remove("hidden-btn");
+          document.getElementById("saveBtn").classList.remove("hidden-btn");
+        }, 3000); // 3초 후
+      };
+
+      image.onload = () => {
+        // 캔버스 크기 설정
+        canvas.width = image.width;
+        canvas.height = image.height;
+
+        // 이미지 그리기
+        ctx.drawImage(image, 0, 0);
+
+        // 텍스트 박스에 들어갈 영역 설정
+        const x = canvas.width / 2; // 텍스트 중앙 정렬
+        const lineHeight = 40; // 줄 간격
+        let y = 200; // 텍스트의 시작 위치
+
+        // verse의 줄바꿈 문자 '\n'을 기준으로 텍스트 나누기
+        const lines = verse.split("\n");
+
+        // 반투명 하얀색 박스 그리기
+        ctx.fillStyle = "rgba(255, 255, 255, 0.6)"; // 하얀색의 반투명 박스
+        const maxWidth = canvas.width - 20; // 텍스트의 최대 너비 (캔버스의 40px 안쪽 여백)
+
+        // 출처 텍스트까지 포함하여 박스를 길게 그리기
+        const boxHeight = lines.length * lineHeight + 120; // 텍스트의 높이 + 여백 + 출처 텍스트 공간
+        const boxWidth = canvas.width - 25;
+        // 사각형 박스 그리기 (둥근 모서리 제외)
+        const boxX = x - boxWidth / 2;
+        const boxY = y - 10;
+
+        ctx.fillRect(boxX, boxY, boxWidth, boxHeight); // 반투명 박스
+
+        // 텍스트 추가
+        ctx.font = "25px Arial";
+        ctx.fillStyle = "black"; // 텍스트 색상
+        ctx.textAlign = "center";
+        ctx.textBaseline = "top";
+
+        // 각 줄을 그려주기
+        lines.forEach((line) => {
+          ctx.fillText(line, x, y);
+          y += lineHeight; // 줄 간격 만큼 y 값 증가
+        });
+
+        // 출처 텍스트 그리기
+        ctx.font = "20px Arial";
+        ctx.fillText(reference, x, y + 50); // 출처는 좀 더 아래에 그려줌
+
+        ctx.font = "25px Arial";
+        ctx.fillText("2025년 말씀", x, 80);
+      };
+
+      // 이미지 저장 버튼 클릭 시
+      document.getElementById("saveBtn").addEventListener("click", () => {
+        const imageUrl = canvas.toDataURL("image/png");
+        const a = document.createElement("a");
+        a.href = imageUrl;
+        a.download = "image-with-text.png";
+        a.click();
+      });
+    </script>
+  </body>
+</html>

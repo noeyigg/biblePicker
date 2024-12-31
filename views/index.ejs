@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>2025년 새해 말씀카드 뽑기</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #f0f0f0;
+      }
+
+      .container {
+        text-align: left;
+        margin-top: 100px;
+        margin-left: 70px;
+      }
+
+      h2 {
+        margin: 0;
+      }
+
+      .subtitle {
+        font-size: 16px;
+        color: #888;
+        margin-bottom: 30px;
+      }
+
+      .btn {
+        width: 250px;
+        padding: 20px 50px;
+        background-color: darkslategrey;
+        color: white;
+        font-size: 20px;
+        border: none;
+        border-radius: 15px;
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: background-color 0.3s, box-shadow 0.3s;
+      }
+
+      .btn:hover {
+        background-color: darkslategrey;
+        box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+      }
+
+      footer {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      /* 이미지들을 가로로 나란히 배치 */
+      .image-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* 이미지 이동 설정 */
+      .image-container img {
+        width: 300px; /* 원하는 이미지 크기 */
+        position: relative;
+        left: -30px; /* 왼쪽으로 10px 이동 */
+        bottom: -40px; /* 아래쪽으로 10px 이동 */
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>2025년</h2>
+      <h2>새해 말씀카드 뽑기</h2>
+      <p></p>
+      <div class="subtitle">올 한해 내게 주신 말씀을 뽑아보세요</div>
+      <div class="image-container">
+        <img src="images/tree.png" alt="Tree Image" />
+      </div>
+    </div>
+
+    <footer>
+      <button class="btn" onclick="window.location.href='/image'">
+        시작하기
+      </button>
+    </footer>
+  </body>
+</html>
