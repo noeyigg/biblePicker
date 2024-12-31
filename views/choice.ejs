@@ -5,41 +5,75 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>이미지 선택</title>
     <style>
+      body {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
       h2 {
         margin: 0;
       }
+
       .container {
         margin-top: 100px;
         margin-left: 70px;
+        flex: none;
       }
+
       .subtitle {
         font-size: 16px;
         color: #888;
         margin-bottom: 30px;
       }
+
+      .content-wrapper {
+        flex: 1;
+        overflow-y: auto;
+        padding-bottom: 100px; /* footer 높이보다 더 큰 값으로 설정 */
+      }
+
       .selected-image {
         display: flex;
-        justify-content: center; /* 수평 중앙 정렬 */
-        align-items: center; /* 수직 중앙 정렬 */
+        justify-content: center;
+        align-items: center;
         text-align: center;
       }
+
       .icons {
-        display: flex; /* 아이콘들을 가로로 정렬 */
-        overflow-x: auto; /* 가로로 스크롤 가능하도록 설정 */
-        white-space: nowrap; /* 아이콘들이 줄 바꿈 없이 한 줄로 나열되도록 설정 */
-        padding: 10px 20px; /* 위아래 패딩 추가 */
+        display: flex;
+        overflow-x: auto;
+        white-space: nowrap;
+        padding: 10px 20px;
+        -webkit-overflow-scrolling: touch; /* iOS에서 부드러운 스크롤 */
       }
+
       .icons img {
         width: 80px;
         height: auto;
         cursor: pointer;
         margin: 2px;
       }
+
       .selected-image img {
         width: 150px;
         height: auto;
         margin-top: 10px;
       }
+
+      footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: white;
+        padding: 20px 0;
+        text-align: center;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+      }
+
       .btn {
         width: 250px;
         padding: 20px 50px;
@@ -57,51 +91,42 @@
         background-color: darkslategrey;
         box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
       }
-
-      footer {
-        position: fixed;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 100%;
-        text-align: center;
-        margin-bottom: 20px;
-      }
     </style>
   </head>
   <body>
-    <div class="container">
-      <h2>말씀카드</h2>
-      <h2>배경 선택하기</h2>
-      <p></p>
-      <div class="subtitle">말씀카드의 배경이 될 그림을 선택하세요.</div>
+    <div class="content-wrapper">
+      <div class="container">
+        <h2>말씀카드</h2>
+        <h2>배경 선택하기</h2>
+        <p></p>
+        <div class="subtitle">말씀카드의 배경이 될 그림을 선택하세요.</div>
+      </div>
+
+      <div class="selected-image">
+        <img id="selectedImage" src="" alt="Selected Image" />
+      </div>
+
+      <div class="icons">
+        <img src="/images/icon8.png" alt="Icon 8" data-image="08.jpeg" />
+        <img src="/images/icon6.png" alt="Icon 6" data-image="06.jpeg" />
+        <img src="/images/icon7.png" alt="Icon 7" data-image="07.jpeg" />
+        <img src="/images/icon1.png" alt="Icon 1" data-image="01.jpeg" />
+        <img src="/images/icon2.png" alt="Icon 2" data-image="02.jpeg" />
+        <img src="/images/icon3.png" alt="Icon 3" data-image="03.jpeg" />
+        <img src="/images/icon4.png" alt="Icon 4" data-image="04.jpeg" />
+        <img src="/images/icon5.png" alt="Icon 5" data-image="05.jpeg" />
+      </div>
     </div>
 
-    <!-- 선택된 큰 이미지가 표시될 영역 -->
-    <div class="selected-image">
-      <img id="selectedImage" src="" alt="Selected Image" />
-    </div>
-
-    <!-- 아이콘 이미지들 -->
-    <div class="icons">
-      <img src="/images/icon8.png" alt="Icon 8" data-image="08.jpeg" />
-      <img src="/images/icon6.png" alt="Icon 6" data-image="06.jpeg" />
-      <img src="/images/icon7.png" alt="Icon 7" data-image="07.jpeg" />
-      <img src="/images/icon1.png" alt="Icon 1" data-image="01.jpeg" />
-      <img src="/images/icon2.png" alt="Icon 2" data-image="02.jpeg" />
-      <img src="/images/icon3.png" alt="Icon 3" data-image="03.jpeg" />
-      <img src="/images/icon4.png" alt="Icon 4" data-image="04.jpeg" />
-      <img src="/images/icon5.png" alt="Icon 5" data-image="05.jpeg" />
-    </div>
     <footer>
-      <!-- 말씀 뽑기 버튼 -->
       <button class="btn" id="drawVerseBtn">말씀 뽑기</button>
     </footer>
+
     <script>
       const icons = document.querySelectorAll(".icons img");
       const selectedImage = document.getElementById("selectedImage");
 
-      // 첫 번째 아이콘을 기본적으로 선택한 것처럼 처리
+      // 첫 번째 아이콘을 기본적으로 선택
       const firstIcon = icons[0];
       const firstImage = firstIcon.getAttribute("data-image");
       selectedImage.src = `/images/${firstImage}`;
@@ -116,8 +141,8 @@
 
       // '말씀 뽑기' 버튼 클릭 시 새로운 화면으로 이동
       document.getElementById("drawVerseBtn").addEventListener("click", () => {
-        const selectedImageName = selectedImage.src.split("/").pop(); // 선택된 이미지 파일 이름
-        window.location.href = `/image/${selectedImageName}`; // 새로운 화면으로 이동
+        const selectedImageName = selectedImage.src.split("/").pop();
+        window.location.href = `/image/${selectedImageName}`;
       });
     </script>
   </body>
